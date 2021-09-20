@@ -12,6 +12,16 @@ let myLibrary = [
     }
 ];
   
+$newButton = document.querySelector('.new');
+$table = document.querySelector('.table');
+$tbody = $table.querySelector('tbody');
+
+$form = document.querySelector('.form');
+$titleInput = $form.querySelector('#title');
+$authorInput = $form.querySelector('#author');
+$pagesInput = $form.querySelector('#pages');
+$submitButton = $form.querySelector('#submit');
+$returnButon = $form.querySelector('#return');
 
 function Book(title, author, pages, read) {
     this.title = title;
@@ -20,6 +30,20 @@ function Book(title, author, pages, read) {
     this.read = read;
 }
 
-function addBookToLibrary() {
-  
+const addBookToLibrary = () => {
+    let title = $titleInput.value;
+    let author = $authorInput.value;
+    let pages = $pagesInput.value;
+    let read = getReadValue();
+    let newBook = new Book(title, author, pages, read);
+    myLibrary.push(newBook);
 }
+
+const getReadValue = () => {
+    if($form.querySelector('input[name="read"]:checked').value == 'yes') return true;
+    else return false;
+}
+
+$submitButton.addEventListener('click', () => {
+    addBookToLibrary();
+});
