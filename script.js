@@ -44,6 +44,48 @@ const getReadValue = () => {
     else return false;
 }
 
+const toggleHiddenElements = () => {
+    $form.classList.toggle('hidden');
+    $table.classList.toggle('hidden');
+    $newButton.classList.toggle('hidden');
+}
+
+const addError = (el) => {
+    let $spanError = document.createElement('span');
+    $spanError.textContent = `Por favor ingresar un ${el.id}`;
+    $spanError.id = `${el.id}Error`
+    $spanError.classList.add('errorText');
+    $form.insertBefore($spanError, el);
+  
+    el.classList.add('errorInput');
+  
+    el.addEventListener('input', removeError);
+}
+  
+const removeError = (el) => {
+    if (el.target.value != '') {
+      el.target.removeEventListener('input', removeError);
+      el.target.classList.remove('errorInput');
+      document.querySelector(`#${el.target.id}Error`).remove();
+    }
+}
+
+const validateForm = () => {
+    if ($titleInput.value == "" && document.querySelector('#titleError') == null) addError($titleInput);
+    if ($authorInput.value == "" && document.querySelector('#authorError') == null) addError($authorInput);
+    if ($pagesInput.value == "" && document.querySelector('#pagesError') == null) addError($pagesInput);
+  
+    if ($titleInput.value == "" || $pagesInput.value == "" || $authorInput.value == "") return false;
+    else return true;
+  
+}
+  
+const clearForm = () => {
+    $titleInput.value = "";
+    $authorInput.value = "";
+    $pagesInput.value = "";
+}
+
 const createReadStatusTd = (book) => {
     let $readStatusTd = document.createElement('td');
     let $readStatusButton = document.createElement('button');
@@ -109,7 +151,16 @@ const updateTable = () => {
     });
 }
 
+$newButton.addEventListener('click', toggleHiddenElements);
+
 $submitButton.addEventListener('click', () => {
     addBookToLibrary();
     updateTable();
+    toggleHiddenElements();
+    clearForm();
+});
+
+$returnButon.addEventListener('click', () => {
+    toggleHiddenElements();
+    clearForm();
 });
