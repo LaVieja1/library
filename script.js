@@ -44,6 +44,72 @@ const getReadValue = () => {
     else return false;
 }
 
+const createReadStatusTd = (book) => {
+    let $readStatusTd = document.createElement('td');
+    let $readStatusButton = document.createElement('button');
+    $readStatusButton.textContent = 'Cambiar estado de leído';
+    $readStatusButton.addEventListener('click', () => {
+      book.read = !book.read;
+      updateTable();
+    });
+    $readStatusTd.appendChild($readStatusButton);
+    return $readStatusTd;
+}
+  
+const removeFromLibrary = (index) => {
+    myLibrary.splice(index, 1)
+    $submitButton.removeEventListener('click', removeFromLibrary);
+    updateTable();
+}
+  
+const createEditTd = (book, index) => {
+    let $editTd = document.createElement('td');
+    let $editButton = document.createElement('button');
+    $editButton.textContent = 'Editar';
+    $editButton.addEventListener('click', () => {
+      $titleInput.value = book.title;
+      $authorInput.value = book.author
+      $pagesInput.value = book.pages
+      book.read ? $form.querySelector('#yes').checked = true : $form.querySelector('#no').checked = true;
+      toggleHiddenElements();
+      $submitButton.addEventListener('click', removeFromLibrary);
+    });
+    $editTd.appendChild($editButton);
+    return $editTd;
+}
+  
+const createDeleteTd = (index) => {
+    let $deleteTd = document.createElement('td');
+    let $deleteButton = document.createElement('button');
+    $deleteButton.textContent = 'Eliminar';
+    $deleteButton.addEventListener('click', () => {
+      myLibrary.splice(index, 1);
+      updateTable();
+    });
+    $deleteTd.appendChild($deleteButton);
+    return $deleteTd;
+}
+
+const updateTable = () => {
+    $tbody.textContent = '';
+  
+    myLibrary.forEach((book, index) => {
+      let $row = document.createElement('tr');
+      Object.keys(book).forEach(prop => {
+        let $newTd = document.createElement('td');
+        $newTd.textContent = book[prop];
+        if (prop == 'read') $newTd.textContent = book[prop] ? 'Read' : 'Not read';
+        $row.appendChild($newTd);
+      }); 
+  
+      $row.appendChild(createReadStatusTd(book));
+      $row.appendChild(createEditTd(book, index));
+      $row.appendChild(createDeleteTd(index));
+      $tbody.appendChild($row);
+    });
+}
+
 $submitButton.addEventListener('click', () => {
     addBookToLibrary();
+    updateTable();
 });
