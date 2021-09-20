@@ -1,8 +1,3 @@
-/*
-const theHobbit = new Book("The Hobbit", "J.R.R. Tolkien", 295, "not read yet")
-const harryPotter = new Book("Harry Potter", "J.K. Rowling", 600, "readed")
-*/
-
 let myLibrary = [
     {
       title: "A Game of Thrones",
@@ -12,24 +7,25 @@ let myLibrary = [
     }
 ];
   
+// DOM Objects
 $newButton = document.querySelector('.new');
 $table = document.querySelector('.table');
 $tbody = $table.querySelector('tbody');
-
+  
 $form = document.querySelector('.form');
 $titleInput = $form.querySelector('#title');
 $authorInput = $form.querySelector('#author');
 $pagesInput = $form.querySelector('#pages');
 $submitButton = $form.querySelector('#submit');
 $returnButon = $form.querySelector('#return');
-
+  
 function Book(title, author, pages, read) {
     this.title = title;
     this.author = author;
     this.pages = pages;
     this.read = read;
 }
-
+  
 const addBookToLibrary = () => {
     let title = $titleInput.value;
     let author = $authorInput.value;
@@ -38,21 +34,29 @@ const addBookToLibrary = () => {
     let newBook = new Book(title, author, pages, read);
     myLibrary.push(newBook);
 }
-
+  
+const populateStorage = () => {
+    localStorage.setItem('library', JSON.stringify(myLibrary));
+}
+  
+const getStorage = () => {
+    myLibrary = JSON.parse(localStorage.getItem('library'));
+}
+  
 const getReadValue = () => {
     if($form.querySelector('input[name="read"]:checked').value == 'yes') return true;
     else return false;
 }
-
+  
 const toggleHiddenElements = () => {
     $form.classList.toggle('hidden');
     $table.classList.toggle('hidden');
     $newButton.classList.toggle('hidden');
 }
-
+  
 const addError = (el) => {
     let $spanError = document.createElement('span');
-    $spanError.textContent = `Por favor ingresar un ${el.id}`;
+    $spanError.textContent = `Porfavor ingrese un ${el.id}`;
     $spanError.id = `${el.id}Error`
     $spanError.classList.add('errorText');
     $form.insertBefore($spanError, el);
@@ -69,7 +73,7 @@ const removeError = (el) => {
       document.querySelector(`#${el.target.id}Error`).remove();
     }
 }
-
+  
 const validateForm = () => {
     if ($titleInput.value == "" && document.querySelector('#titleError') == null) addError($titleInput);
     if ($authorInput.value == "" && document.querySelector('#authorError') == null) addError($authorInput);
@@ -85,11 +89,11 @@ const clearForm = () => {
     $authorInput.value = "";
     $pagesInput.value = "";
 }
-
+  
 const createReadStatusTd = (book) => {
     let $readStatusTd = document.createElement('td');
     let $readStatusButton = document.createElement('button');
-    $readStatusButton.textContent = 'Cambiar estado de leído';
+    $readStatusButton.textContent = 'Cambiar estado de lectura';
     $readStatusButton.addEventListener('click', () => {
       book.read = !book.read;
       updateTable();
@@ -131,7 +135,7 @@ const createDeleteTd = (index) => {
     $deleteTd.appendChild($deleteButton);
     return $deleteTd;
 }
-
+  
 const updateTable = () => {
     $tbody.textContent = '';
   
@@ -149,18 +153,33 @@ const updateTable = () => {
       $row.appendChild(createDeleteTd(index));
       $tbody.appendChild($row);
     });
+  
+    populateStorage();
 }
-
-$newButton.addEventListener('click', toggleHiddenElements);
-
-$submitButton.addEventListener('click', () => {
-    addBookToLibrary();
+  
+document.addEventListener('DOMContentLoaded', () => {
+    $pagesInput.addEventListener('input', () => {if(!$pagesInput.validity.valid) $pagesInput.value='' });
+    
+    $newButton.addEventListener('click', toggleHiddenElements);
+  
+    $submitButton.addEventListener('click', () => {
+      if (validateForm() == false) return;
+      addBookToLibrary();
+      updateTable();
+      toggleHiddenElements();
+      clearForm();
+    });
+  
+    $returnButon.addEventListener('click', () => {
+      toggleHiddenElements();
+      clearForm();
+    });
+  
+    if(!localStorage.getItem('library')) {
+      populateStorage();
+    } else {
+      getStorage();
+    }
+  
     updateTable();
-    toggleHiddenElements();
-    clearForm();
-});
-
-$returnButon.addEventListener('click', () => {
-    toggleHiddenElements();
-    clearForm();
 });
